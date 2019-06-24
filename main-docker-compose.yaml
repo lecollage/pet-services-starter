@@ -4,48 +4,48 @@ services:
 
   postgres:
     image: postgres
-    restart: always
+    restart: ${MAIN_RESTART_POLICY}
     environment:
-      POSTGRES_PASSWORD: 12345
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_database:/var/lib/postgresql/data
     networks:
-      - go-test-1
+      - pet-project-network
       
   adminer:
     image: adminer
-    restart: always
+    restart: ${MAIN_RESTART_POLICY}
     ports:
-      - 8080:8080
+      - ${POSTGRES_ADMINER_EXPOSE_PORT}:8080
     depends_on:
       - "postgres"
     networks:
-      - go-test-1
+      - pet-project-network
 
   goservice:
     image: "goservice:0.15"
     depends_on:
       - "postgres"
     networks:
-      - go-test-1
+      - pet-project-network
 
   nginx-angular-go:
     image: "nginx-angular-go:0.2"
     ports:
-      - "80:80"
-      - "8082:80"
+      - ${NGINX_EXPOSE_PORT_1}:80
+      - ${NGINX_EXPOSE_PORT_2}:80
     depends_on:
       - "goservice"
     networks:
-      - go-test-1
+      - pet-project-network
 
 volumes:
     postgres_database:
         external: true
 
 networks:
-  go-test-1:
+  pet-project-network:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.27.195.192/27
+        - subnet: ${NETWORK_SUBNET}

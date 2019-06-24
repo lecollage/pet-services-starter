@@ -6,8 +6,8 @@ read_var() {
     echo ${VAR[1]}
 }
 
-DEFAULT_COMPONENTS=$(read_var DEFAULT_COMPONENTS .env)
-PROJECT_NAME=$(read_var PROJECT_NAME .env)
+MAIN_DEFAULT_COMPONENTS=$(read_var MAIN_DEFAULT_COMPONENTS .env)
+MAIN_PROJECT_NAME=$(read_var MAIN_PROJECT_NAME .env)
 COMPONENTS=""
 PARAM_POSITION=0
 MODE=""
@@ -15,7 +15,7 @@ GET_MODE=false
 CONTAINER_LABEL=""
 SERVICE_PS=""
 
-for i in $DEFAULT_COMPONENTS
+for i in $MAIN_DEFAULT_COMPONENTS
 do
   COMPONENTS="$COMPONENTS -f $i.yaml"
 done
@@ -50,7 +50,7 @@ do
 done
 
 if $GET_MODE; then
-  SERVICE_PS="docker-compose -p $PROJECT_NAME -f main-docker-compose.yaml $COMPONENTS ps -q"
+  SERVICE_PS="docker-compose -p $MAIN_PROJECT_NAME -f main-docker-compose.yaml $COMPONENTS ps -q"
   source images-versions/images-versions
   docker ps --filter "label=service.name=$CONTAINER_LABEL" $(for i in $($SERVICE_PS); do echo "--filter id=$i" ; done) --format "{{.ID}}"
 else
@@ -58,5 +58,5 @@ else
   mkdir -p postrges-dumps
   mkdir -p logs
   source images-versions/images-versions
-  docker-compose -p $PROJECT_NAME -f main-docker-compose.yaml $COMPONENTS $MODE
+  docker-compose -p $MAIN_PROJECT_NAME -f main-docker-compose.yaml $COMPONENTS $MODE
 fi
