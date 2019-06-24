@@ -11,7 +11,7 @@ services:
       - postgres_database:/var/lib/postgresql/data
     networks:
       - pet-project-network
-      
+
   adminer:
     image: adminer
     restart: ${MAIN_RESTART_POLICY}
@@ -23,14 +23,14 @@ services:
       - pet-project-network
 
   goservice:
-    image: "goservice:0.15"
+    image: "goservice:${VERSIONS_GOSERVICE_TAG}"
     depends_on:
       - "postgres"
     networks:
       - pet-project-network
 
   nginx-angular-go:
-    image: "nginx-angular-go:0.2"
+    image: "nginx-angular-go:${VERSIONS_NGINX_ANGULAR_GO_TAG}"
     ports:
       - ${NGINX_EXPOSE_PORT_1}:80
       - ${NGINX_EXPOSE_PORT_2}:80

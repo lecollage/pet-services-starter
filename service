@@ -51,12 +51,12 @@ done
 
 if $GET_MODE; then
   SERVICE_PS="docker-compose -p $MAIN_PROJECT_NAME -f main-docker-compose.yaml $COMPONENTS ps -q"
-  source images-versions/images-versions
+  source components-versions/components-versions
   docker ps --filter "label=service.name=$CONTAINER_LABEL" $(for i in $($SERVICE_PS); do echo "--filter id=$i" ; done) --format "{{.ID}}"
 else
   mkdir -p postgres-data
   mkdir -p postrges-dumps
   mkdir -p logs
-  source images-versions/images-versions
+  source components-versions/components-versions
   docker-compose -p $MAIN_PROJECT_NAME -f main-docker-compose.yaml $COMPONENTS $MODE
 fi
