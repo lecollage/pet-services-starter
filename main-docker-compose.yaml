@@ -1,0 +1,51 @@
+version: '3.1'
+
+services:
+
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: 12345
+    volumes:
+      - postgres_database:/var/lib/postgresql/data
+    networks:
+      - go-test-1
+      
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    depends_on:
+      - "postgres"
+    networks:
+      - go-test-1
+
+  goservice:
+    image: "goservice:0.15"
+    depends_on:
+      - "postgres"
+    networks:
+      - go-test-1
+
+  nginx-angular-go:
+    image: "nginx-angular-go:0.2"
+    ports:
+      - "80:80"
+      - "8082:80"
+    depends_on:
+      - "goservice"
+    networks:
+      - go-test-1
+
+volumes:
+    postgres_database:
+        external: true
+
+networks:
+  go-test-1:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.27.195.192/27

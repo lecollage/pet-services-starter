@@ -1,0 +1,62 @@
+#!/bin/bash
+
+read_var() {
+    VAR=$(grep $1 $2 | xargs)
+    IFS="=" read -ra VAR <<< "$VAR"
+    echo ${VAR[1]}
+}
+
+DEFAULT_COMPONENTS=$(read_var DEFAULT_COMPONENTS .env)
+PROJECT_NAME=$(read_var PROJECT_NAME .env)
+COMPONENTS=""
+PARAM_POSITION=0
+MODE=""
+GET_MODE=false
+CONTAINER_LABEL=""
+SERVICE_PS=""
+
+for i in $DEFAULT_COMPONENTS
+do
+  COMPONENTS="$COMPONENTS -f $i.yaml"
+done
+
+for i in "$@"
+do
+  if [[ $PARAM_POSITION = 0 ]]
+  then
+    if [[ $i = "up" ]]; then
+        MODE="up -d --remove-orphans"
+    fi
+    if [[ $i = "down" ]]; then
+        MODE="down --remove-orphans"
+    fi
+    if [[ $i = "ps" ]]; then
+        MODE="ps"
+    fi
+    if [[ $i = "psq" ]]; then
+        MODE="ps -q"
+    fi
+    if [[ $i = "get" ]]; then
+        GET_MODE=true
+    fi
+  else
+    if $GET_MODE && [[ $PARAM_POSITION = 1 ]]; then
+      CONTAINER_LABEL="$i"
+    else
+      COMPONENTS="$COMPONENTS -f $i.yaml" 
+    fi
+  fi
+  let "PARAM_POSITION=PARAM_POSITION+1"
+done
+
+if $GET_MODE; then
+  SERVICE_PS="docker-compose -p $PROJECT_NAME -f main-docker-compose.yaml $COMPONENTS ps -q"
+  source images-versions/images-versions
+  docker ps --filter "label=service.name=$CONTAINER_LABEL" $(for i in $($SERVICE_PS); do echo "--filter id=$i" ; done) --format "{{.ID}}"
+else
+  mkdir -p postgres-data
+  mkdir -p postrges-dumps
+  mkdir -p logs
+  source images-versions/images-versions
+  docker-compose -p $PROJECT_NAME -f main-docker-compose.yaml $COMPONENTS $MODE
+fi

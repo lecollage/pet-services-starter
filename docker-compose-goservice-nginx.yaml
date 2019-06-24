@@ -1,0 +1,15 @@
+version: "3.6"
+
+services:
+
+  goservice:
+    image: "goservice:0.10"
+    ports:
+      - "8090:8090"
+
+  nginx:
+    image: "nginx-go:0.1"
+    ports:
+      - "80:80"
+    depends_on:
+      - "goservice"
