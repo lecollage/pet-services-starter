@@ -22,20 +22,20 @@ services:
     networks:
       - pet-project-network
 
-  goservice:
-    image: "goservice:${VERSIONS_GOSERVICE_TAG}"
+  pet-web-server:
+    image: "ekalashnikov59/pet-web-server:${PET_WEB_SERVER}"
     depends_on:
       - "postgres"
     networks:
       - pet-project-network
 
-  nginx-angular-go:
-    image: "nginx-angular-go:${VERSIONS_NGINX_ANGULAR_GO_TAG}"
+  pet-web-client:
+    image: "ekalashnikov59/pet-web-client:${PET_WEB_CLIENT}"
     ports:
       - ${NGINX_EXPOSE_PORT_1}:80
       - ${NGINX_EXPOSE_PORT_2}:80
     depends_on:
-      - "goservice"
+      - "pet-web-server"
     networks:
       - pet-project-network
 

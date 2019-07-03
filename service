@@ -25,7 +25,7 @@ do
   if [[ $PARAM_POSITION = 0 ]]
   then
     if [[ $i = "up" ]]; then
-        MODE="up -d --remove-orphans"
+        MODE="up -d --remove-orphans --force-recreate"
     fi
     if [[ $i = "down" ]]; then
         MODE="down --remove-orphans"
