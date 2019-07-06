@@ -31,11 +31,22 @@ services:
 
   pet-web-client:
     image: "ekalashnikov59/pet-web-client:${PET_WEB_CLIENT}"
-    ports:
-      - ${NGINX_EXPOSE_PORT_1}:80
-      - ${NGINX_EXPOSE_PORT_2}:80
     depends_on:
       - "pet-web-server"
+    networks:
+      - pet-project-network
+
+  pet-reverse-proxy-nginx:
+    image: "blacklabelops/nginx"
+    environment:
+      - SERVER1REVERSE_PROXY_LOCATION1=/
+      - SERVER1REVERSE_PROXY_PASS1=http://pet-web-client:80/
+      - SERVER1REVERSE_PROXY_LOCATION2=/api
+      - SERVER1REVERSE_PROXY_PASS2=http://pet-web-server:8090/
+    ports:
+      - ${NGINX_REVERSE_PROXY_EXPOSE_PORT_1}:80
+    depends_on:
+      - "pet-web-client"
     networks:
       - pet-project-network
 
