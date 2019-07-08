@@ -45,8 +45,18 @@ services:
       - SERVER1REVERSE_PROXY_DISABLE_RESOLVER2=true
       - SERVER1REVERSE_PROXY_LOCATION2=/api/
       - SERVER1REVERSE_PROXY_PASS2=http://pet-web-server:8090/
+      - SERVER1HTTPS_ENABLED=true
+      - SERVER1HTTP_ENABLED=false
+      - SERVER1LETSENCRYPT_CERTIFICATES=true
+      - SERVER1CERTIFICATE_FILE=/etc/letsencrypt/live/meet-foreigners.today/cert.pem
+      - SERVER1CERTIFICATE_KEY=/etc/letsencrypt/live/meet-foreigners.today/privkey.pem
+      - SERVER1CERTIFICATE_TRUSTED=/etc/letsencrypt/live/meet-foreigners.today/fullchain.pem
+      - NGINX_REDIRECT_PORT80=true
     ports:
       - ${NGINX_REVERSE_PROXY_EXPOSE_PORT_1}:80
+      - 443:443
+    volumes:
+      - letsencrypt_certs:/etc/letsencrypt
     depends_on:
       - "pet-web-client"
     networks:
@@ -54,6 +64,8 @@ services:
 
 volumes:
     postgres_database:
+        external: true
+    letsencrypt_certs:
         external: true
 
 networks:
